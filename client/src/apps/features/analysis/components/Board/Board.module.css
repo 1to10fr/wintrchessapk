@@ -22,8 +22,8 @@
     display: flex;
     width: 100%;
 
-    /* Stop the page scrolling / selecting text while dragging pieces */
-    touch-action: none;
+    /* Pieces already block scrolling while dragged, so the board itself
+       stays scrollable */
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;

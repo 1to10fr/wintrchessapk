@@ -20,6 +20,22 @@
     overscroll-behavior: contain;
 }
 
+/* On phones let scrolling continue into the page instead of getting stuck,
+   and don't select text / flash highlights while swiping */
+@media (max-width: 900px) {
+    .components {
+        overscroll-behavior: auto;
+    }
+}
+
+@media (pointer: coarse) {
+    .components {
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
 .title {
     text-align: center;
     padding: 5px 10px;

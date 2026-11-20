@@ -9,8 +9,21 @@
     transition: background-color 0.3s;
 }
 
-.wrapper:hover {
-    background-color: rgba(0, 0, 0, 0.25);
+/* On touch screens :hover sticks after a tap and looks like a selection */
+@media (hover: hover) {
+    .wrapper:hover {
+        background-color: rgba(0, 0, 0, 0.25);
+    }
+}
+
+@media (pointer: coarse) {
+    .wrapper {
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
 }
 
 .current {
