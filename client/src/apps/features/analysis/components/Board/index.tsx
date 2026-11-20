@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from "react";
 import { Chessboard } from "react-chessboard";
 import { Piece, Square } from "react-chessboard/dist/chessboard/types";
 import { Chess, Move, PieceSymbol } from "chess.js";
+import { TouchBackend } from "react-dnd-touch-backend";
 
 import { defaultRootNode } from "shared/constants/utils";
 import { isMovePromotion } from "shared/lib/utils/chess";
@@ -17,6 +18,20 @@ import BoardProps from "./BoardProps";
 import * as styles from "./Board.module.css";
 
 type ClickMove = Pick<Move, "from" | "to">;
+
+// react-chessboard already switches to the touch backend on touch devices,
+// but with zero slop: any finger jitter during a tap starts a drag, which
+// makes taps unreliable. A small slop keeps taps as taps.
+const isTouchDevice = typeof window != "undefined"
+    && "ontouchstart" in window;
+
+const touchBackendOptions = {
+    enableTouchEvents: true,
+    enableMouseEvents: true,
+    touchSlop: 10,
+    delayTouchStart: 0,
+    ignoreContextMenu: true
+};
 
 function getPieceType(piece: Piece) {
     return piece.at(1)?.toLowerCase() as PieceSymbol;
@@ -40,9 +55,12 @@ function Board({
 }: BoardProps) {
     const squares = useSquares();
 
+    const renderStateRef = useRef({ node, enableClassifications });
+    renderStateRef.current = { node, enableClassifications };
+
     const squareRenderer = useMemo(() => (
-        createSquareRenderer(node, enableClassifications)
-    ), [node, enableClassifications]);
+        createSquareRenderer(renderStateRef)
+    ), []);
 
     const [ heldPromotion, setHeldPromotion ] = useState<ClickMove>();
 
@@ -55,41 +73,48 @@ function Board({
     function onSquareClick(square: Square, piece?: Piece) {
         squares.setHighlighted([]);
 
-        if (!piece || square == squares.selected) {
+        const from = squares.selected;
+
+        // Tapping a highlighted target plays the move and always clears the
+        // selection afterwards, so stale dots never linger
+        if (from && (
+            squares.playable.includes(square)
+            || squares.capturable.includes(square)
+        )) {
+            const selectedPiece = new Chess(node.state.fen).get(from);
+
             squares.setSelected(undefined);
             squares.clearPlayable();
-        } else {
-            squares.setSelected(square);
-            squares.loadPlayable(node.state.fen, square);
+
+            if (selectedPiece && isMovePromotion(selectedPiece.type, square)) {
+                setHeldPromotion({ from, to: square });
+                return;
+            }
+
+            addMove(from, square);
+            return;
         }
 
-        if (!squares.selected) return;
-        if (
-            !squares.playable.includes(square)
-            && !squares.capturable.includes(square)
-        ) return;
-
-        const selectedPiece = new Chess(node.state.fen)
-            .get(squares.selected);
-
-        if (selectedPiece && isMovePromotion(selectedPiece.type, square)) {
-            setHeldPromotion({
-                from: squares.selected,
-                to: square
-            });
+        if (!piece || square == from) {
+            squares.setSelected(undefined);
+            squares.clearPlayable();
+            return;
         }
 
-        addMove(squares.selected, square);
+        squares.setSelected(square);
+        squares.loadPlayable(node.state.fen, square);
     }
 
     function onPromotionPieceSelect(
         piece?: Piece, from?: Square, to?: Square
     ) {
-        if (!piece || !to) return false;
-
+        // Always close the dialog, including when it is cancelled
+        const held = heldPromotion;
         setHeldPromotion(undefined);
 
-        const fromSquare = heldPromotion?.from || from;
+        if (!piece || !to) return false;
+
+        const fromSquare = held?.from || from;
         if (!fromSquare) return false;
         
         return addMove(fromSquare, to, getPieceType(piece));
@@ -146,6 +171,11 @@ function Board({
                         return addMove(from, to, getPieceType(piece), true);
                     }}
                     onPromotionPieceSelect={onPromotionPieceSelect}
+                    customDndBackend={isTouchDevice ? TouchBackend : undefined}
+                    customDndBackendOptions={isTouchDevice
+                        ? touchBackendOptions
+                        : undefined
+                    }
                     customSquare={squareRenderer}
                     customArrows={arrows}
                     arePiecesDraggable={piecesDraggable}
@@ -157,7 +187,7 @@ function Board({
                         ? { backgroundColor: theme.darkSquareColour }
                         : undefined
                     }
-                    animationDuration={165}
+                    animationDuration={100}
                     showPromotionDialog={!!heldPromotion}
                     promotionToSquare={heldPromotion?.to}
                     promotionDialogVariant="vertical"

@@ -19,6 +19,32 @@ const moveSounds = {
     gameEnd: iconGameend
 };
 
+// Creating and decoding a new Audio element per move is slow on mobile
+// WebViews and stutters the piece animation, so each sound is loaded once.
+const audioCache: Partial<Record<keyof typeof moveSounds, HTMLAudioElement>> = {};
+
+function play(name: keyof typeof moveSounds) {
+    let audio = audioCache[name];
+
+    if (!audio) {
+        audio = new Audio(moveSounds[name]);
+        audio.preload = "auto";
+        audioCache[name] = audio;
+    }
+
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+}
+
+if (typeof Audio != "undefined") {
+    (Object.keys(moveSounds) as (keyof typeof moveSounds)[])
+        .forEach(name => {
+            const audio = new Audio(moveSounds[name]);
+            audio.preload = "auto";
+            audioCache[name] = audio;
+        });
+}
+
 function playBoardSound(node: StateTreeNode) {
     const move = node.state.move;
     if (!move) return;
@@ -26,21 +52,21 @@ function playBoardSound(node: StateTreeNode) {
     const board = new Chess(node.state.fen);
 
     if (board.isGameOver()) {
-        new Audio(moveSounds.gameEnd).play();
+        play("gameEnd");
     }
 
     const parsedMove = parseSanMove(move.san);
 
     if (parsedMove.check || parsedMove.checkmate) {
-        new Audio(moveSounds.check).play();
+        play("check");
     } else if (parsedMove.castling) {
-        new Audio(moveSounds.castle).play();
+        play("castle");
     } else if (parsedMove.promotion) {
-        new Audio(moveSounds.promote).play();
+        play("promote");
     } else if (parsedMove.capture) {
-        new Audio(moveSounds.capture).play();
+        play("capture");
     } else {
-        new Audio(moveSounds.move).play();
+        play("move");
     }
 }
 

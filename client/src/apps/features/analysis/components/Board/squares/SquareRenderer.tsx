@@ -35,13 +35,19 @@ function getSquareElements(children: ReactNode) {
     return [ piece, ...notations ];
 }
 
-function createSquareRenderer(
-    node: StateTreeNode,
-    enableClassifications: boolean
-) {
+export type SquareRenderState = {
+    node: StateTreeNode;
+    enableClassifications: boolean;
+};
+
+// The renderer is created once and reads the latest node from a ref. A new
+// component type per move would remount all 64 squares (and their drag
+// sources, even mid-drag), which is slow and drops touch gestures.
+function createSquareRenderer(stateRef: { current: SquareRenderState }) {
     return forwardRef<HTMLDivElement, CustomSquareProps>((
         { children, style, square }, ref
     ) => {
+        const { node, enableClassifications } = stateRef.current;
         const squares = useContext(SquaresContext);
 
         useEffect(() => {
