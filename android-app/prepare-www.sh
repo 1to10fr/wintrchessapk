@@ -31,9 +31,12 @@ router = """<style>a[href="/signin"] { display: none !important; }</style>
 
         if (path.indexOf("/settings") == 0) bundle = "settings";
         else if (path.indexOf("/archive") == 0) bundle = "archive";
-        else if (path.indexOf("/news") == 0) bundle = "news";
+        else if (path.indexOf("/news") == 0) bundle = "changelog";
+        else if (path.indexOf("/changelog") == 0) bundle = "changelog";
         else if (path.indexOf("/help") == 0) bundle = "helpCenter";
         else if (path.indexOf("/legal") == 0) bundle = "legal";
+        else if (path.indexOf("/terms") == 0) bundle = "legal";
+        else if (path.indexOf("/privacy") == 0) bundle = "legal";
         else if (path.indexOf("/analysis") != 0) {
             history.replaceState(null, "", "/analysis");
         }

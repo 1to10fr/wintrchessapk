@@ -14,6 +14,7 @@ module.exports = {
         analysis: "./src/apps/features/analysis/index.tsx",
         archive: "./src/apps/features/archive/index.tsx",
         news: "./src/apps/features/news/index.tsx",
+        changelog: "./src/apps/features/changelog/index.tsx",
 
         signin: "./src/apps/account/signin/index.tsx",
         resetPassword: "./src/apps/account/resetPassword/index.tsx",

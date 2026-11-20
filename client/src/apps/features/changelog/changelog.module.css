@@ -1,0 +1,84 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-sizing: border-box;
+    padding: 20px 15px 40px;
+    width: min(700px, 100%);
+    margin: 0 auto;
+
+    color: var(--ui-text);
+}
+
+.title {
+    margin: 0;
+
+    font-family: "Nunito";
+    font-size: 2rem;
+}
+
+.release {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+
+    border-radius: 10px;
+    background-color: var(--ui-shade-3);
+}
+
+.header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.version {
+    font-family: "Nunito";
+    font-size: 1.3rem;
+}
+
+.date {
+    color: var(--ui-text-muted);
+    font-size: 0.85rem;
+}
+
+.changes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.changes li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.tag {
+    flex-shrink: 0;
+    min-width: 70px;
+    padding: 2px 8px;
+
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.new {
+    background-color: #2f9e5e;
+}
+
+.improved {
+    background-color: var(--ui-blue);
+}
+
+.fixed {
+    background-color: #c97a1a;
+}
