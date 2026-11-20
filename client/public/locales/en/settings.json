@@ -42,7 +42,14 @@
             "blue": "Blue",
             "ice": "Ice",
             "marshmallow": "Marshmallow",
-            "pillow": "Pillow"
+            "pillow": "Pillow",
+            "midnight": "Midnight",
+            "coral": "Coral",
+            "forest": "Forest",
+            "lavender": "Lavender",
+            "slate": "Slate",
+            "desert": "Desert",
+            "mint": "Mint"
         }
     },
     "bugReporting": {

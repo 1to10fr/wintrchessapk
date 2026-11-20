@@ -18,7 +18,14 @@ const boardColourPresets = [
     { light: "#eae8d3", dark: "#4b7298", name: "blue" },
     { light: "#d9e4e8", dark: "#83a5b6", name: "ice" },
     { light: "#f5f1f0", dark: "#f8c8dc", name: "marshmallow" },
-    { light: "#b6b8e1", dark: "#9c9fd9", name: "pillow" }
+    { light: "#b6b8e1", dark: "#9c9fd9", name: "pillow" },
+    { light: "#aab4c8", dark: "#3b4663", name: "midnight" },
+    { light: "#f7e4d6", dark: "#d98a6c", name: "coral" },
+    { light: "#e6e8d5", dark: "#4e6e50", name: "forest" },
+    { light: "#e8dff5", dark: "#8b6fb8", name: "lavender" },
+    { light: "#d4d9de", dark: "#66727f", name: "slate" },
+    { light: "#f3e7c9", dark: "#c99a5b", name: "desert" },
+    { light: "#e4f2ea", dark: "#6fae93", name: "mint" }
 ];
 
 function BoardAndPieces() {

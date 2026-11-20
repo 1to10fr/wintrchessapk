@@ -40,6 +40,8 @@ function RealtimeEngine({
     const [ evaluationError, setEvaluationError ] = useState<string>();
 
     const evaluationDelayRef = useRef<Timeout>();
+    const pendingLinesRef = useRef<EngineLine[]>([]);
+    const flushTimerRef = useRef<Timeout>();
 
     const position = useMemo(() => {
         const board = new Chess(initialPosition);
@@ -104,6 +106,27 @@ function RealtimeEngine({
         onEngineLines?.(displayedLines)
     ), [displayedLines]);
 
+    // The engine reports many lines per second; applying each one separately
+    // re-renders the board and panel constantly and makes phones stutter, so
+    // they are batched into one update every 150ms instead.
+    function flushPendingLines() {
+        clearTimeout(flushTimerRef.current);
+        flushTimerRef.current = undefined;
+
+        const batch = pendingLinesRef.current;
+        pendingLinesRef.current = [];
+
+        if (batch.length > 0) {
+            setRealtimeEngineLines(prev => [ ...prev, ...batch ]);
+        }
+    }
+
+    function discardPendingLines() {
+        clearTimeout(flushTimerRef.current);
+        flushTimerRef.current = undefined;
+        pendingLinesRef.current = [];
+    }
+
     async function evaluatePosition() {
         if (!engine) return;
 
@@ -121,10 +144,17 @@ function RealtimeEngine({
                     && (hydratedConfig.timeLimit * 1000)
                 ),
                 onEngineLine: line => {
-                    setRealtimeEngineLines(prev => [ ...prev, line ]);
+                    pendingLinesRef.current.push(line);
+
+                    if (!flushTimerRef.current) {
+                        flushTimerRef.current = setTimeout(
+                            flushPendingLines, 150
+                        );
+                    }
                 }
             });
 
+            flushPendingLines();
             onEvaluationComplete?.(lines);
         } catch {
             setEvaluationError(
@@ -144,6 +174,7 @@ function RealtimeEngine({
                 clearTimeout(evaluationDelayRef.current);
             }
 
+            discardPendingLines();
             setRealtimeEngineLines([]);
 
             evaluationDelayRef.current = setTimeout(evaluatePosition, 400);
