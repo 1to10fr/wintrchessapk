@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [master, main]
-    tags: ["v*"]
 
 # Needed so a pushed version tag can publish a GitHub release
 permissions:
@@ -43,7 +42,7 @@ jobs:
           sed -i '/<style name="AppTheme/a\        <item name="android:forceDarkAllowed">false</item>' \
             android/app/src/main/res/values/styles.xml
           # App version shown on the phone
-          sed -i 's/versionCode 1$/versionCode 2/; s/versionName "1.0"/versionName "1.1.0"/' \
+          sed -i "s/versionCode 1\$/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"$(cat ../VERSION)\"/" \
             android/app/build.gradle
           # Allow vibration for move haptics
           sed -i 's|</manifest>|    <uses-permission android:name="android.permission.VIBRATE" />\n</manifest>|' \
@@ -56,13 +55,20 @@ jobs:
           name: wintrchess-apk
           path: android-app/android/app/build/outputs/apk/debug/app-debug.apk
 
-      # Pushing a tag such as v1.1.0 publishes the APK as a release
+      # Publishes a release the first time a version in android-app/VERSION
+      # is built, so bumping that file and pushing is all a release takes
       - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: github.ref_type == 'branch' && github.ref_name == 'master'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          TAG="v$(cat android-app/VERSION)"
           cp android-app/android/app/build/outputs/apk/debug/app-debug.apk \
-            "WintrChess-${GITHUB_REF_NAME}.apk"
-          gh release create "$GITHUB_REF_NAME" "WintrChess-${GITHUB_REF_NAME}.apk" \
-            --title "WintrChess ${GITHUB_REF_NAME}" --generate-notes
+            "WintrChess-${TAG}.apk"
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists, skipping"
+          else
+            gh release create "$TAG" "WintrChess-${TAG}.apk" \
+              --target "$GITHUB_SHA" --title "WintrChess ${TAG}" \
+              --generate-notes
+          fi
