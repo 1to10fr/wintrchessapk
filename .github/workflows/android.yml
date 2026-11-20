@@ -56,20 +56,34 @@ jobs:
           path: android-app/android/app/build/outputs/apk/debug/app-debug.apk
 
       # Publishes a release the first time a version in android-app/VERSION
-      # is built, so bumping that file and pushing is all a release takes
+      # is built, so bumping that file and pushing is all a release takes.
+      # Release descriptions come from release-notes/<version>.md, and every
+      # existing release gets its description refreshed from those files.
       - name: Publish release
         if: github.ref_type == 'branch' && github.ref_name == 'master'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="v$(cat android-app/VERSION)"
+          VERSION="$(cat android-app/VERSION)"
+          TAG="v$VERSION"
           cp android-app/android/app/build/outputs/apk/debug/app-debug.apk \
             "WintrChess-${TAG}.apk"
+
           if gh release view "$TAG" > /dev/null 2>&1; then
-            echo "Release $TAG already exists, replacing its APK"
-            gh release upload "$TAG" "WintrChess-${TAG}.apk" --clobber
+            echo "Release $TAG already exists"
+          elif [ -f "release-notes/$VERSION.md" ]; then
+            gh release create "$TAG" "WintrChess-${TAG}.apk" \
+              --target "$GITHUB_SHA" --title "WintrChess ${TAG}" \
+              --notes-file "release-notes/$VERSION.md"
           else
             gh release create "$TAG" "WintrChess-${TAG}.apk" \
               --target "$GITHUB_SHA" --title "WintrChess ${TAG}" \
               --generate-notes
           fi
+
+          for notes in release-notes/*.md; do
+            NOTES_TAG="v$(basename "$notes" .md)"
+            if gh release view "$NOTES_TAG" > /dev/null 2>&1; then
+              gh release edit "$NOTES_TAG" --notes-file "$notes"
+            fi
+          done
