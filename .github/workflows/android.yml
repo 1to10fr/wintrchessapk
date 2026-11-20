@@ -4,6 +4,11 @@ on:
   workflow_dispatch:
   push:
     branches: [master, main]
+    tags: ["v*"]
+
+# Needed so a pushed version tag can publish a GitHub release
+permissions:
+  contents: write
 
 jobs:
   apk:
@@ -50,3 +55,14 @@ jobs:
         with:
           name: wintrchess-apk
           path: android-app/android/app/build/outputs/apk/debug/app-debug.apk
+
+      # Pushing a tag such as v1.1.0 publishes the APK as a release
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android-app/android/app/build/outputs/apk/debug/app-debug.apk \
+            "WintrChess-${GITHUB_REF_NAME}.apk"
+          gh release create "$GITHUB_REF_NAME" "WintrChess-${GITHUB_REF_NAME}.apk" \
+            --title "WintrChess ${GITHUB_REF_NAME}" --generate-notes
