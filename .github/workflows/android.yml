@@ -42,7 +42,7 @@ jobs:
           sed -i '/<style name="AppTheme/a\        <item name="android:forceDarkAllowed">false</item>' \
             android/app/src/main/res/values/styles.xml
           # App version shown on the phone
-          sed -i "s/versionCode 1\$/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"$(cat ../VERSION)\"/" \
+          sed -i "s/versionCode 1\$/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"$(cat VERSION)\"/" \
             android/app/build.gradle
           # Allow vibration for move haptics
           sed -i 's|</manifest>|    <uses-permission android:name="android.permission.VIBRATE" />\n</manifest>|' \
@@ -66,7 +66,8 @@ jobs:
           cp android-app/android/app/build/outputs/apk/debug/app-debug.apk \
             "WintrChess-${TAG}.apk"
           if gh release view "$TAG" > /dev/null 2>&1; then
-            echo "Release $TAG already exists, skipping"
+            echo "Release $TAG already exists, replacing its APK"
+            gh release upload "$TAG" "WintrChess-${TAG}.apk" --clobber
           else
             gh release create "$TAG" "WintrChess-${TAG}.apk" \
               --target "$GITHUB_SHA" --title "WintrChess ${TAG}" \
