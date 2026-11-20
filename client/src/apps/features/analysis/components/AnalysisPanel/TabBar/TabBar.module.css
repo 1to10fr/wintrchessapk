@@ -22,7 +22,7 @@
 }
 
 .button:hover {
-    color: white;
+    color: var(--ui-text);
 
     filter: brightness(1) !important;
 }
@@ -35,7 +35,7 @@
 .selectedButton {
     background-color: var(--ui-shade-6);
 
-    color: white;
+    color: var(--ui-text);
 }
 
 .reportButton {

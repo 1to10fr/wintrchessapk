@@ -9,7 +9,7 @@
     z-index: 1000;
 
     background-color: var(--ui-shade-3);
-    color: white;
+    color: var(--ui-text);
     
     overflow-y: auto;
 }

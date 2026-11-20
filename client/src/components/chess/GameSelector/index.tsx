@@ -162,7 +162,7 @@ function GameSelector({
 
         {gameSource.selectorButton == GameSelectorButton.UPLOAD_FILE
             && <FileUploader
-                extensions={[".pgn"]}
+                extensions={[".pgn", ".txt", "text/plain", "application/x-chess-pgn"]}
                 onFilesUpload={async files => {
                     const pgn = await files.item(0)?.text();
                     if (!pgn) return;

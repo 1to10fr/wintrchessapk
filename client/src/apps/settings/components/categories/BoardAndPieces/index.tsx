@@ -6,6 +6,9 @@ import BoardColourPreset from "@/apps/settings/components/BoardColourPreset";
 import ColourSwatch from "@/components/settings/ColourSwatch";
 import Button from "@/components/common/Button";
 import Separator from "@/components/common/Separator";
+import SwitchSetting from "@/components/settings/SwitchSetting";
+import { DEFAULT_ACCENT } from "@/lib/appTheme";
+import type { AppTheme } from "@/lib/appTheme";
 
 import * as categoryStyles from "../Category.module.css";
 import * as styles from "./BoardAndPieces.module.css";
@@ -28,6 +31,27 @@ const boardColourPresets = [
     { light: "#e4f2ea", dark: "#6fae93", name: "mint" }
 ];
 
+const appThemes: { key: AppTheme, label: string }[] = [
+    { key: "dark", label: "Dark" },
+    { key: "light", label: "Light" },
+    { key: "amoled", label: "AMOLED" }
+];
+
+const accentColours = [
+    "#467de8", "#8b5cf6", "#ec4899", "#ef4444",
+    "#f59e0b", "#10b981", "#14b8a6", "#64748b"
+];
+
+const pieceSets = [
+    { key: "", label: "Default", preview: "/img/pieces/standard/white_king.svg" },
+    { key: "cburnett", label: "Classic" },
+    { key: "merida", label: "Merida" },
+    { key: "mono", label: "Mono" },
+    { key: "chessnut", label: "Chessnut" },
+    { key: "fantasy", label: "Fantasy" },
+    { key: "pixel", label: "Pixel" }
+];
+
 function BoardAndPieces() {
     const { t } = useTranslation(["settings", "common"]);
 
@@ -43,6 +67,15 @@ function BoardAndPieces() {
         setDarkSquareColourSwatchOpen
     ] = useState(false);
 
+    const [ openSwatch, setOpenSwatch ] = useState<string | null>(null);
+
+    function setTheme(update: (themes: typeof settings.themes) => void) {
+        setSettings(draft => {
+            update(draft.themes);
+            return draft;
+        });
+    }
+
     function setBoardColours(light: string, dark: string) {
         setSettings(draft => {
             draft.themes.board.lightSquareColour = light;
@@ -57,10 +90,65 @@ function BoardAndPieces() {
         onClick={event => {
             setLightSquareColourSwatchOpen(false);
             setDarkSquareColourSwatchOpen(false);
+            setOpenSwatch(null);
 
             event.stopPropagation();
         }}
     >
+        <b className={categoryStyles.header}>
+            {t("boardAndPieces.appTheme", { defaultValue: "App Theme" })}
+        </b>
+
+        <Separator className={categoryStyles.separator} />
+
+        <div className={styles.chips}>
+            {appThemes.map(appTheme => <div
+                key={appTheme.key}
+                className={
+                    styles.chip
+                    + (settings.themes.app == appTheme.key
+                        ? ` ${styles.chipSelected}` : "")
+                }
+                onClick={() => setTheme(themes => {
+                    themes.app = appTheme.key;
+                })}
+            >
+                {appTheme.label}
+            </div>)}
+        </div>
+
+        <div className={categoryStyles.setting}>
+            <span>
+                {t("boardAndPieces.accentColour", {
+                    defaultValue: "Accent Colour"
+                })}
+            </span>
+
+            <ColourSwatch
+                colour={settings.themes.accent}
+                onColourChange={colour => setTheme(themes => {
+                    themes.accent = colour;
+                })}
+                open={openSwatch == "accent"}
+                onToggle={open => setOpenSwatch(open ? "accent" : null)}
+            />
+        </div>
+
+        <div className={styles.dots}>
+            {accentColours.map(colour => <div
+                key={colour}
+                className={
+                    styles.dot
+                    + (settings.themes.accent == colour
+                        ? ` ${styles.dotSelected}` : "")
+                }
+                style={{ backgroundColor: colour }}
+                onClick={() => setTheme(themes => {
+                    themes.accent = colour;
+                })}
+            />)}
+        </div>
+
         <b className={categoryStyles.header}>
             {t("boardAndPieces.boardColour")}
         </b>
@@ -131,6 +219,126 @@ function BoardAndPieces() {
                 }
                 onClick={() => setBoardColours(preset.light, preset.dark)}
             />)}
+        </div>
+
+        <b className={categoryStyles.header}>
+            {t("boardAndPieces.pieceSet", { defaultValue: "Piece Set" })}
+        </b>
+
+        <Separator className={categoryStyles.separator} />
+
+        <div className={styles.pieceOptions}>
+            {pieceSets.map(pieceSet => <div
+                key={pieceSet.key}
+                className={
+                    styles.pieceOption
+                    + (settings.themes.piece == pieceSet.key
+                        ? ` ${styles.pieceOptionSelected}` : "")
+                }
+                onClick={() => setTheme(themes => {
+                    themes.piece = pieceSet.key;
+                })}
+            >
+                <img
+                    src={pieceSet.preview
+                        || `/img/pieces/${pieceSet.key}/wN.svg`}
+                />
+
+                <span>{pieceSet.label}</span>
+            </div>)}
+        </div>
+
+        <b className={categoryStyles.header}>
+            {t("boardAndPieces.boardExtras", {
+                defaultValue: "Board Extras"
+            })}
+        </b>
+
+        <Separator className={categoryStyles.separator} />
+
+        <div className={categoryStyles.setting}>
+            <span>
+                {t("boardAndPieces.showCoordinates", {
+                    defaultValue: "Show Coordinates"
+                })}
+            </span>
+
+            <SwitchSetting
+                defaultChecked={settings.themes.board.showCoordinates}
+                onChange={checked => setTheme(themes => {
+                    themes.board.showCoordinates = checked;
+                })}
+            />
+        </div>
+
+        <div className={categoryStyles.setting}>
+            <span>
+                {t("boardAndPieces.lastMoveColour", {
+                    defaultValue: "Last Move Highlight"
+                })}
+            </span>
+
+            <ColourSwatch
+                colour={settings.themes.board.lastMoveColour || "#ffff33"}
+                onColourChange={colour => setTheme(themes => {
+                    themes.board.lastMoveColour = colour;
+                })}
+                open={openSwatch == "lastMove"}
+                onToggle={open => setOpenSwatch(open ? "lastMove" : null)}
+            />
+        </div>
+
+        <div className={categoryStyles.setting}>
+            <span>
+                {t("boardAndPieces.arrowColour", {
+                    defaultValue: "Engine Arrow Colour"
+                })}
+            </span>
+
+            <ColourSwatch
+                colour={settings.themes.board.arrowColour || "#81b64c"}
+                onColourChange={colour => setTheme(themes => {
+                    themes.board.arrowColour = colour;
+                })}
+                open={openSwatch == "arrow"}
+                onToggle={open => setOpenSwatch(open ? "arrow" : null)}
+            />
+        </div>
+
+        <Button
+            icon={iconInterfaceDelete}
+            onClick={() => setTheme(themes => {
+                themes.app = "dark";
+                themes.accent = DEFAULT_ACCENT;
+                themes.piece = "";
+                themes.board.lastMoveColour = "";
+                themes.board.arrowColour = "";
+                themes.board.showCoordinates = true;
+            })}
+        >
+            {t("reset", { ns: "common" })}
+        </Button>
+
+        <b className={categoryStyles.header}>
+            {t("boardAndPieces.feel", { defaultValue: "Feel" })}
+        </b>
+
+        <Separator className={categoryStyles.separator} />
+
+        <div className={categoryStyles.setting}>
+            <span>
+                {t("boardAndPieces.haptics", {
+                    defaultValue: "Vibrate on Moves"
+                })}
+            </span>
+
+            <SwitchSetting
+                defaultChecked={settings.haptics}
+                onChange={checked => setSettings(draft => {
+                    draft.haptics = checked;
+                    return draft;
+                })}
+            />
         </div>
     </div>;
 }

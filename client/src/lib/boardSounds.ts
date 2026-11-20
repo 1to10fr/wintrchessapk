@@ -2,6 +2,7 @@ import { Chess } from "chess.js";
 
 import { StateTreeNode } from "shared/types/game/position/StateTreeNode";
 import { parseSanMove } from "shared/lib/utils/chess";
+import useSettingsStore from "@/stores/SettingsStore";
 
 import iconMove from "@assets/audio/move.mp3";
 import iconCheck from "@assets/audio/check.mp3";
@@ -23,7 +24,28 @@ const moveSounds = {
 // WebViews and stutters the piece animation, so each sound is loaded once.
 const audioCache: Partial<Record<keyof typeof moveSounds, HTMLAudioElement>> = {};
 
+const vibrationPatterns: Record<keyof typeof moveSounds, number | number[]> = {
+    move: 12,
+    capture: 25,
+    castle: 20,
+    promote: 25,
+    check: [ 30, 40, 30 ],
+    gameEnd: 80
+};
+
+function vibrate(name: keyof typeof moveSounds) {
+    if (!useSettingsStore.getState().settings.haptics) return;
+
+    try {
+        navigator.vibrate?.(vibrationPatterns[name]);
+    } catch {
+        // Haptics are optional; ignore devices that refuse
+    }
+}
+
 function play(name: keyof typeof moveSounds) {
+    vibrate(name);
+
     let audio = audioCache[name];
 
     if (!audio) {

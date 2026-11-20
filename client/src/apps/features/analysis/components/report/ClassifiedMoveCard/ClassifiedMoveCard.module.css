@@ -58,12 +58,12 @@
 
     border-radius: 0 0 10px 10px;
     background-color: #2c2f3596;
-    color: white;
+    color: var(--ui-text);
 
     overflow-wrap: anywhere;
 }
 
 .explanation {
-    color: #d6d6d6;
+    color: var(--ui-text-soft);
     font-size: 0.9em;
 }

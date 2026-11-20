@@ -7,7 +7,7 @@
     width: 100%;
 
     background-color: var(--ui-shade-2);
-    color: white;
+    color: var(--ui-text);
 }
 
 .section {
@@ -16,7 +16,7 @@
 }
 
 .section a {
-    color: white;
+    color: var(--ui-text);
 }
 
 .links {

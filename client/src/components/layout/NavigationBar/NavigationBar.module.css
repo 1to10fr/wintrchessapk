@@ -12,7 +12,7 @@
     top: 0;
 
     background-color: var(--ui-shade-2);
-    color: white;
+    color: var(--ui-text);
 
     overflow-x: auto;
 }

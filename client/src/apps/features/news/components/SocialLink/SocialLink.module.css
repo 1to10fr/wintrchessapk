@@ -18,5 +18,5 @@
 }
 
 .username {
-    color: white;
+    color: var(--ui-text);
 }

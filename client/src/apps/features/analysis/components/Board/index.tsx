@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import { Chessboard } from "react-chessboard";
 import { Piece, Square } from "react-chessboard/dist/chessboard/types";
+import type { CustomPieces } from "react-chessboard/dist/chessboard/types";
 import { Chess, Move, PieceSymbol } from "chess.js";
 import { TouchBackend } from "react-dnd-touch-backend";
 
@@ -24,6 +25,27 @@ type ClickMove = Pick<Move, "from" | "to">;
 // makes taps unreliable. A small slop keeps taps as taps.
 const isTouchDevice = typeof window != "undefined"
     && "ontouchstart" in window;
+
+const pieceCodes: Piece[] = [
+    "wP", "wN", "wB", "wR", "wQ", "wK",
+    "bP", "bN", "bB", "bR", "bQ", "bK"
+];
+
+function buildCustomPieces(pieceSet: string): CustomPieces {
+    const pieces: CustomPieces = {};
+
+    for (const code of pieceCodes) {
+        pieces[code] = ({ squareWidth }) => <img
+            src={`/img/pieces/${pieceSet}/${code}.svg`}
+            width={squareWidth}
+            height={squareWidth}
+            draggable={false}
+            style={{ display: "block", pointerEvents: "none" }}
+        />;
+    }
+
+    return pieces;
+}
 
 const touchBackendOptions = {
     enableTouchEvents: true,
@@ -54,6 +76,10 @@ function Board({
     onAddMove
 }: BoardProps) {
     const squares = useSquares();
+
+    const customPieces = useMemo(() => (
+        theme?.pieceSet ? buildCustomPieces(theme.pieceSet) : undefined
+    ), [theme?.pieceSet]);
 
     const renderStateRef = useRef({ node, enableClassifications });
     renderStateRef.current = { node, enableClassifications };
@@ -177,6 +203,8 @@ function Board({
                         : undefined
                     }
                     customSquare={squareRenderer}
+                    customPieces={customPieces}
+                    showBoardNotation={theme?.showCoordinates ?? true}
                     customArrows={arrows}
                     arePiecesDraggable={piecesDraggable}
                     customLightSquareStyle={theme?.lightSquareColour

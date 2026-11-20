@@ -6,7 +6,7 @@
 }
 
 .wrapper a {
-    color: white;
+    color: var(--ui-text);
 }
 
 .content {
@@ -18,7 +18,7 @@
     width: min(100%, 800px);
 
     background-color: rgba(0, 0, 0, 0.15);
-    color: white;
+    color: var(--ui-text);
 }
 
 .title {

@@ -23,7 +23,7 @@
     width: min(800px, 100%);
 
     background-color: rgba(0, 0, 0, 0.2);
-    color: white;
+    color: var(--ui-text);
 }
 
 .articleLoaderContainer {
@@ -79,5 +79,5 @@
 .content * {
     text-align: start;
 
-    color: white;
+    color: var(--ui-text);
 }

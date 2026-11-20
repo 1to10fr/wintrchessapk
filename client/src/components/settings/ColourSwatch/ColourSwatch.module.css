@@ -31,5 +31,5 @@
     border-radius: 5px;
     border: 2px solid var(--ui-shade-3);
     background-color: var(--ui-shade-4);
-    color: white;
+    color: var(--ui-text);
 }

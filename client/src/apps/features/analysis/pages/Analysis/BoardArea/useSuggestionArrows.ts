@@ -15,6 +15,10 @@ const arrowColour = classificationColours[Classification.BEST];
 function useSuggestionArrows(): Arrow[] {
     const settings = useSettingsStore(state => state.settings.analysis);
 
+    const customArrowColour = useSettingsStore(
+        state => state.settings.themes.board.arrowColour
+    );
+
     const node = useAnalysisBoardStore(state => state.currentStateTreeNode);
 
     const { displayedEngineLines } = useRealtimeEngineStore();
@@ -28,7 +32,7 @@ function useSuggestionArrows(): Arrow[] {
 
             const topMove = parseUciMove(uciMove);
 
-            return [[topMove.from, topMove.to, arrowColour]];
+            return [[topMove.from, topMove.to, customArrowColour || arrowColour]];
         }
 
         if (arrowsType == EngineArrowType.TOP_ALTERNATIVE) {
@@ -41,14 +45,19 @@ function useSuggestionArrows(): Arrow[] {
 
             const previousTopMove = parseUciMove(previousTopUci);
 
-            return [[previousTopMove.from, previousTopMove.to, arrowColour]];
+            return [[
+                previousTopMove.from,
+                previousTopMove.to,
+                customArrowColour || arrowColour
+            ]];
         }
 
         return [];
     }, [
         node.state.fen,
         displayedEngineLines,
-        settings.engine.suggestionArrows
+        settings.engine.suggestionArrows,
+        customArrowColour
     ]);
 }
 

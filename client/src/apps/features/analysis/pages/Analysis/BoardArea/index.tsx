@@ -65,7 +65,9 @@ function BoardArea() {
         blackProfile={analysisGame.players.black}
         theme={{
             lightSquareColour: theme.board.lightSquareColour,
-            darkSquareColour: theme.board.darkSquareColour
+            darkSquareColour: theme.board.darkSquareColour,
+            pieceSet: theme.piece,
+            showCoordinates: theme.board.showCoordinates
         }}
         node={currentStateTreeNode}
         flipped={boardFlipped}

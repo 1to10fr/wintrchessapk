@@ -19,6 +19,7 @@ import {
 } from "@analysis/constants/classifications";
 
 import { SquaresContext } from "./SquaresContext";
+import useSettingsStore from "@/stores/SettingsStore";
 import * as styles from "./Square.module.css";
 
 function getSquareElements(children: ReactNode) {
@@ -50,6 +51,10 @@ function createSquareRenderer(stateRef: { current: SquareRenderState }) {
         const { node, enableClassifications } = stateRef.current;
         const squares = useContext(SquaresContext);
 
+        const lastMoveColour = useSettingsStore(
+            state => state.settings.themes.board.lastMoveColour
+        );
+
         useEffect(() => {
             if (!squares.pieceDropFlag) return;
             squares.setPieceDropFlag(false);
@@ -61,7 +66,7 @@ function createSquareRenderer(stateRef: { current: SquareRenderState }) {
 
         const highlightColour = node.state.classification
             ? classificationColours[node.state.classification]
-            : "#ffff33";
+            : lastMoveColour || "#ffff33";
 
         const [ piece, ...notations ] = getSquareElements(children);
 

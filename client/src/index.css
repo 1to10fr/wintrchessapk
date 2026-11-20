@@ -24,6 +24,10 @@
     --ui-shade-6: #3e4349;
     --ui-shade-7: #50575f;
 
+    --ui-text: #ffffff;
+    --ui-text-soft: #dbdbdb;
+    --ui-text-muted: rgba(255, 255, 255, 0.5);
+
     --rt-color-dark: #111 !important;
 }
 
@@ -32,6 +36,7 @@ body {
     overflow-x: hidden;
 
     background-color: var(--ui-shade-1);
+    color: var(--ui-text);
 }
 
 * {

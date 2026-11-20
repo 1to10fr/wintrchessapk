@@ -7,6 +7,7 @@ import EngineVersion from "shared/constants/EngineVersion";
 import EngineArrowType from "@analysis/constants/EngineArrowType";
 import LocalStorageKey from "@/constants/LocalStorageKey";
 import { ENGINE_PRESETS, getDeviceTier } from "@/lib/device";
+import { applyAppTheme, DEFAULT_ACCENT } from "@/lib/appTheme";
 
 // Search depth and lines are chosen to suit this device's speed
 const devicePreset = ENGINE_PRESETS[getDeviceTier()];
@@ -36,10 +37,17 @@ const settingsSchema = z.object({
     themes: z.object({
         board: z.object({
             darkSquareColour: z.string().regex(/^#.{6}$/),
-            lightSquareColour: z.string().regex(/^#.{6}$/)
+            lightSquareColour: z.string().regex(/^#.{6}$/),
+            // An empty colour means "use the built-in default"
+            lastMoveColour: z.string(),
+            arrowColour: z.string(),
+            showCoordinates: z.boolean()
         }),
-        piece: z.string()
+        piece: z.string(),
+        app: z.enum(["dark", "light", "amoled"]),
+        accent: z.string().regex(/^#.{6}$/)
     }),
+    haptics: z.boolean(),
     bugReportingMode: z.boolean()
 });
 
@@ -71,10 +79,16 @@ export const defaultSettings: Settings = {
     themes: {
         board: {
             darkSquareColour: "#b58863",
-            lightSquareColour: "#f0d9b5"
+            lightSquareColour: "#f0d9b5",
+            lastMoveColour: "",
+            arrowColour: "",
+            showCoordinates: true
         },
-        piece: ""
+        piece: "",
+        app: "dark",
+        accent: DEFAULT_ACCENT
     },
+    haptics: true,
     bugReportingMode: false
 };
 
@@ -97,6 +111,10 @@ interface SettingsStore {
     setSettings: (updater: SettingsReducer) => void;
 }
 
+function applyThemeSettings(settings: Settings) {
+    applyAppTheme(settings.themes.app, settings.themes.accent);
+}
+
 const useSettingsStore = create<SettingsStore>((set, get) => ({
     settings: fetchSettings(),
 
@@ -111,5 +129,9 @@ const useSettingsStore = create<SettingsStore>((set, get) => ({
         );
     }
 }));
+
+applyThemeSettings(useSettingsStore.getState().settings);
+
+useSettingsStore.subscribe(state => applyThemeSettings(state.settings));
 
 export default useSettingsStore;

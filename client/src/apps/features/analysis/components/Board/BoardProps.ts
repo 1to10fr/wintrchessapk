@@ -21,6 +21,7 @@ interface BoardProps {
         lightSquareColour?: string;
         darkSquareColour?: string;
         pieceSet?: string;
+        showCoordinates?: boolean;
     };
     piecesDraggable?: boolean;
     enableClassifications?: boolean;
