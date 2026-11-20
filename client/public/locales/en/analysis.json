@@ -115,6 +115,14 @@
     "accuraciesCard": {
         "title": "Accuracies"
     },
+    "turningPointsCard": {
+        "title": "Turning points",
+        "lost": "{{colour}} lost about {{percent}}% win chance",
+        "colours": {
+            "white": "White",
+            "black": "Black"
+        }
+    },
     "classifiedMoveCard": {
         "unknownError": "A classification could not be loaded.",
         "insufficientLines": "Make sure the previous move is fully evaluated for a classification.",
@@ -131,7 +139,24 @@
             "theory": "is theory",
             "risky": "is a risky idea"
         },
-        "alternative": "The best move was"
+        "alternative": "The best move was",
+        "explanations": {
+            "brilliant": "You gave up material for a stronger position.",
+            "critical": "This was the only move that kept your advantage.",
+            "allowsMate": "This lets your opponent force checkmate in {{moves}}.",
+            "missedMate": "You had a forced checkmate in {{moves}}.",
+            "hungPiece": "This leaves your {{piece}} open to being captured.",
+            "missedCapture": "You could have won a {{piece}}.",
+            "evalDrop": "You lost about {{pawns}} pawns of advantage.",
+            "betterExists": "There was a stronger move in this position."
+        },
+        "pieces": {
+            "p": "pawn",
+            "n": "knight",
+            "b": "bishop",
+            "r": "rook",
+            "q": "queen"
+        }
     },
     "classifications": {
         "brilliant": "Brilliant",

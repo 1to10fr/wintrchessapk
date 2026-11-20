@@ -3,6 +3,7 @@ import { Chess } from "chess.js";
 import { EngineLine } from "shared/types/game/position/EngineLine";
 import EngineVersion from "shared/constants/EngineVersion";
 import { STARTING_FEN } from "shared/constants/utils";
+import { supportsWasmSimd } from "@/lib/device";
 
 // Convert UCI evaluation types to our ones
 const uciEvaluationTypes: Record<string, string | undefined> = {
@@ -18,6 +19,11 @@ class Engine {
     private evaluating = false;
 
     constructor(version: EngineVersion) {
+        // Old browsers/CPUs without WebAssembly or its SIMD extension fall
+        // back to the asm.js engine (the Stockfish wasm builds need SIMD)
+        if (!supportsWasmSimd())
+            version = EngineVersion.STOCKFISH_17_ASM;
+
         this.worker = new Worker("/engines/" + version);
         this.version = version;
 

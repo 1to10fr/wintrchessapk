@@ -6,6 +6,10 @@ import z from "zod";
 import EngineVersion from "shared/constants/EngineVersion";
 import EngineArrowType from "@analysis/constants/EngineArrowType";
 import LocalStorageKey from "@/constants/LocalStorageKey";
+import { ENGINE_PRESETS, getDeviceTier } from "@/lib/device";
+
+// Search depth and lines are chosen to suit this device's speed
+const devicePreset = ENGINE_PRESETS[getDeviceTier()];
 
 const settingsSchema = z.object({
     analysis: z.object({
@@ -47,8 +51,8 @@ export const defaultSettings: Settings = {
         engine: {
             enabled: true,
             version: EngineVersion.STOCKFISH_17_LITE,
-            depth: 16,
-            lines: 2,
+            depth: devicePreset.depth,
+            lines: devicePreset.lines,
             timeLimitEnabled: false,
             timeLimit: 1,
             threads: 4,

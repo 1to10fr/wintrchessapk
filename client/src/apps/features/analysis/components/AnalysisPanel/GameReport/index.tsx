@@ -5,6 +5,7 @@ import useAnalysisGameStore from "@analysis/stores/AnalysisGameStore";
 import useAnalysisBoardStore from "@analysis/stores/AnalysisBoardStore";
 import AccuraciesCard from "@analysis/components/report/AccuraciesCard";
 import ClassificationCountCard from "@analysis/components/report/ClassificationCountCard";
+import TurningPointsCard from "@analysis/components/report/TurningPointsCard";
 
 import EvaluationGraphArea from "./EvaluationGraphArea";
 
@@ -19,6 +20,8 @@ function GameReport() {
         <EvaluationGraphArea/>
 
         <AccuraciesCard accuracies={accuracies} />
+
+        <TurningPointsCard/>
 
         <ClassificationCountCard analysisGame={analysisGame} />
     </>;

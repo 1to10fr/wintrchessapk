@@ -62,3 +62,8 @@
 
     overflow-wrap: anywhere;
 }
+
+.explanation {
+    color: #d6d6d6;
+    font-size: 0.9em;
+}

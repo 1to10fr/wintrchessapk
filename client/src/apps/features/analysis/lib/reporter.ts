@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { clone } from "lodash-es";
 
 import AnalysisOptions from "shared/lib/reporter/types/AnalysisOptions";
+import { getGameAnalysis } from "shared/lib/reporter/report";
 import {
     GameAnalysis,
     SerializedGameAnalysis
@@ -17,28 +18,27 @@ export async function analyseStateTree(
     rootNode: StateTreeNode,
     options?: AnalysisOptions
 ): APIResponse<{ gameAnalysis: GameAnalysis }> {
-    const reportURL = "/api/analysis/analyse"
-        + `?brilliant=${String(options?.includeBrilliant)}`
-        + `&critical=${String(options?.includeCritical)}`
-        + `&theory=${String(options?.includeTheory)}`;
+    // Classification runs locally (no server). Round-tripping through
+    // serialize/deserialize gives getGameAnalysis a fresh, mutable tree,
+    // exactly as the old server endpoint did.
+    let serializedAnalysis: SerializedGameAnalysis;
 
-    const reportResponse = await fetch(reportURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-            serializeNode(rootNode)
-        )
-    });
+    try {
+        const gameAnalysis = getGameAnalysis(
+            deserializeNode(serializeNode(rootNode)),
+            options
+        );
 
-    if (!reportResponse.ok)
-        return { status: reportResponse.status };
-
-    const serializedAnalysis: SerializedGameAnalysis = (
-        await reportResponse.json()
-    );
+        serializedAnalysis = {
+            ...gameAnalysis,
+            stateTree: serializeNode(gameAnalysis.stateTree)
+        };
+    } catch {
+        return { status: StatusCodes.INTERNAL_SERVER_ERROR };
+    }
 
     return {
-        status: reportResponse.status,
+        status: StatusCodes.OK,
         gameAnalysis: {
             ...serializedAnalysis,
             stateTree: deserializeNode(

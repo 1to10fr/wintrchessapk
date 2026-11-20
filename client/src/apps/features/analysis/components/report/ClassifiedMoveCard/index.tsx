@@ -10,6 +10,7 @@ import {
 } from "shared/types/game/position/StateTreeNode";
 import { Classification } from "shared/constants/Classification";
 import { getSimpleNotation } from "shared/lib/utils/chess";
+import { explainMove } from "shared/lib/reporter/explain";
 import { getTopEngineLine } from "shared/types/game/position/EngineLine";
 import {
     classificationColours,
@@ -97,6 +98,22 @@ function ClassifiedMoveCard() {
 
     const topAlternativeMove = getTopAlternativeMove(node);
 
+    // Short plain-English reason for the classification, if there is one
+    const explanation = node.state.classification
+        ? explainMove(node) : null;
+
+    const explanationText = explanation && t(
+        "classifiedMoveCard.explanations." + explanation.key,
+        {
+            ns: "analysis",
+            ...explanation.params,
+            piece: explanation.params?.piece && t(
+                "classifiedMoveCard.pieces." + explanation.params.piece,
+                { ns: "analysis" }
+            )
+        }
+    );
+
     function playTopAlternative() {
         if (!node.parent) return;
         if (!topAlternativeMove) return;
@@ -148,6 +165,12 @@ function ClassifiedMoveCard() {
                 && <LogMessage style={{ marginTop: "5px" }}>
                     {t(realtimeClassifyError, { ns: "analysis" })}
                 </LogMessage>
+            }
+
+            {explanationText
+                && <span className={styles.explanation}>
+                    {explanationText}
+                </span>
             }
 
             {topAlternativeMove

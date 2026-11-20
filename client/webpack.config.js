@@ -45,6 +45,15 @@ module.exports = {
                 use: "babel-loader"
             },
             {
+                // Transpile dependencies too, so old browsers can run them
+                test: /\.m?jsx?$/i,
+                // shared/dist is symlinked into node_modules but resolves to
+                // its real path, so it needs listing explicitly
+                include: [/node_modules/, resolve("../shared/dist")],
+                exclude: /node_modules[\\/]core-js/,
+                use: "babel-loader"
+            },
+            {
                 test: /\.css$/i,
                 use: [
                     "style-loader",
@@ -69,5 +78,7 @@ module.exports = {
             silent: true
         })
     ],
+    // Emit ES5 for the webpack runtime itself (old Android/iOS browsers)
+    target: ["web", "es5"],
     mode: nodeEnv
 };
